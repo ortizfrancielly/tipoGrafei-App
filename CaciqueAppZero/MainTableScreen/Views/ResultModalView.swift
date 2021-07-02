@@ -1,17 +1,23 @@
 //
-//  ResultFormViewController.swift
+//  ResultModalView.swift
 //  tipoGrafei
 //
-//  Created by Marcos Chevis on 28/06/21.
+//  Created by Marcos Chevis on 01/07/21.
 //
 
 import Foundation
 import UIKit
 
-class ResultFormViewController: UIViewController {
+class ResultModalView: UIView {
     
     
-    @IBOutlet weak var resultsCollectionView: UICollectionView!
+    lazy var resultsCollectionView: UICollectionView = {
+        let collection = UICollectionView(frame: self.frame, collectionViewLayout: UICollectionViewLayout())
+        collection.translatesAutoresizingMaskIntoConstraints = false
+        collection.backgroundColor = .systemYellow
+        
+        return collection
+    }()
     
     var database: [FontInfo] = FontsDatabase().database
     var formData: FormDataSingleton = .shared
@@ -20,8 +26,10 @@ class ResultFormViewController: UIViewController {
     var rowIdentifier = "ResultCell"
     
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        addSubview(resultsCollectionView)
+        
         resultsCollectionView.register(CollectionViewResultCell.self, forCellWithReuseIdentifier: rowIdentifier)
         resultsCollectionView.dataSource = self
         let layout = UICollectionViewFlowLayout()
@@ -30,9 +38,25 @@ class ResultFormViewController: UIViewController {
         resultsCollectionView.collectionViewLayout = layout
         resultsCollectionView.showsVerticalScrollIndicator = false
     
+        setupConstraints()
 
     }
-    override func viewWillAppear(_ animated: Bool) {
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupConstraints() {
+        let constaints: [NSLayoutConstraint] = [
+            resultsCollectionView.topAnchor.constraint(equalTo: self.topAnchor),
+            resultsCollectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            resultsCollectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            resultsCollectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+        ]
+        NSLayoutConstraint.activate(constaints)
+    }
+    
+    func updateCollection() {
         filteredDatabase = filterDatabase(hasSerif: formData.hasSerif, family: formData.fontFamily)
         resultsCollectionView.reloadData()
     }
@@ -48,10 +72,9 @@ class ResultFormViewController: UIViewController {
         }
         return filteredDatabase
     }
-
 }
 
-extension ResultFormViewController: UICollectionViewDataSource {
+extension ResultModalView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return filteredDatabase.count
     }
@@ -76,6 +99,6 @@ extension ResultFormViewController: UICollectionViewDataSource {
     
 }
 
-extension ResultFormViewController: UICollectionViewDelegate {
+extension ResultModalView: UICollectionViewDelegate {
     
 }
